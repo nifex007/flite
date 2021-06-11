@@ -130,12 +130,14 @@ def p2p_transfer(sender, recipient, amount):
     sender.refresh_from_db()
     recipient.refresh_from_db()
 
+    transaction_reference = generate_transaction_refrence_code()
+
     # log transactions 
 
     # sender (debit)
     log_transaction(
         user=sender.owner,
-        reference=generate_transaction_refrence_code(),
+        reference=transaction_reference,
         status=COMPLETED,
         type=DEBIT,
         amount=amount,
@@ -145,7 +147,7 @@ def p2p_transfer(sender, recipient, amount):
     # recipient (credit)
     log_transaction(
         user=recipient.owner,
-        reference=generate_transaction_refrence_code(),
+        reference= transaction_reference,
         status=COMPLETED,
         type=CREDIT,
         amount=amount,
