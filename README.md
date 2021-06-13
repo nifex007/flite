@@ -14,9 +14,13 @@ docker-compose up
 ````
 
 
-### API Documentation
+## Documentation
+### Collection
+
 https://www.getpostman.com/collections/1a1049d53dd560f75aff
 
+### API Endpoints & Responses
+https://documenter.getpostman.com/view/10026788/TzeTKA1Y
 
 ## Test
 
