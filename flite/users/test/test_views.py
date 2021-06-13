@@ -165,6 +165,59 @@ class TestTransactions(APITestCase):
         eq_(response_message, 'Transfer successful')
         eq_(recipient_balance_after_transfer.book_balance, 500.00)
 
+    def test_prevent_p2p_transfer_from_account_by_non_owner_of_account(self):
+
+        recipient_user = UserFactory()
+
+        # fund account
+        deposit_url = reverse('users-deposits', kwargs={'pk': self.user.pk})
+        deposit_payload = {'amount': 600}
+        self.client.post(deposit_url, deposit_payload)
+        # account status before transfer
+        sender = Balance.objects.get(owner=self.user)
+        recipient = Balance.objects.get(owner=recipient_user)
+
+        # swapped sender with recipient to reproduce the case for sending from account that is not the user's
+
+        url = reverse('p2p_transfer', kwargs={'sender_account_id': recipient.pk, 'recipient_account_id': sender.pk})
+        payload = {
+            "amount" : 500.00
+        }
+        # accounts status after transfer 
+        response = self.client.post(url, payload)
+        response_message = response.json()['detail']
+
+        recipient_balance_after_transfer = Balance.objects.get(owner=recipient_user)
+        eq_(response.status_code, status.HTTP_403_FORBIDDEN)
+        eq_(response_message, 'You do not have permission to perform this action.')
+        eq_(recipient_balance_after_transfer.book_balance, 0.00)
+
+
+    def test_invalid_account_p2p_transfer(self):
+
+        recipient_user = UserFactory()
+
+        # fund account
+        deposit_url = reverse('users-deposits', kwargs={'pk': self.user.pk})
+        deposit_payload = {'amount': 600}
+        self.client.post(deposit_url, deposit_payload)
+        # account status before transfer
+        sender = Balance.objects.get(owner=self.user)
+        recipient = Balance.objects.get(owner=recipient_user)
+
+        url = reverse('p2p_transfer', kwargs={'sender_account_id': self.user.pk, 'recipient_account_id': recipient.pk})
+        payload = {
+            "amount" : 500.00
+        }
+        # accounts status after transfer 
+        response = self.client.post(url, payload)
+        response_message = response.json()['detail']
+        recipient_balance_after_transfer = Balance.objects.get(owner=recipient_user)
+        eq_(response.status_code, status.HTTP_403_FORBIDDEN)
+        eq_(response_message, 'Invalid Account')
+        eq_(recipient_balance_after_transfer.book_balance, 0.00)
+
+
     def test_user_can_not_make_a_p2p_transfer_to_self(self):
         # get user's account
         b = Balance.objects.get(owner=self.user)

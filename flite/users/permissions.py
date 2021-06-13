@@ -32,4 +32,5 @@ class IsOwnAccount(permissions.BasePermission):
             account = Balance.objects.get(id=request_account_id)
         except Balance.DoesNotExist:
             raise exceptions.PermissionDenied(detail='Invalid Account')
+
         return request.user == account.owner
