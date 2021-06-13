@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import User, NewUserPhoneVerification, Balance, Transaction
-from .permissions import IsUserOrReadOnly
+from .permissions import IsUserOrReadOnly, IsOwnAccount
 from .serializers import CreateUserSerializer, TransactionSerializer, UserSerializer, SendNewPhonenumberSerializer, AmountSerializer
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
@@ -128,7 +128,7 @@ class SendNewPhonenumberVerifyViewSet(mixins.CreateModelMixin,mixins.UpdateModel
 
 class P2PTransferView(GenericAPIView):
 
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (IsUserOrReadOnly, IsOwnAccount)
     # serializer_class = UserSerializer
 
     def get_objects(self, request):
@@ -162,17 +162,13 @@ class P2PTransferView(GenericAPIView):
         return Response(data= {"message": amount_serializer.errors['amount'][0]}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TransactionViewSet(
-    # mixins.ListModelMixin,
-    # viewsets.GenericViewSet
-    viewsets.ViewSet
-    ):
+class TransactionViewSet(viewsets.ViewSet):
 
     "Get Transactions on an account"
     
     serializer_class = TransactionSerializer
     pagination_class = utils.CustomPagination
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (IsUserOrReadOnly, IsOwnAccount, )
     
 
     def get_object(self, request):
