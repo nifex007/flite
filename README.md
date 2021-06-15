@@ -29,4 +29,4 @@ https://documenter.getpostman.com/view/10026788/TzeTKA1Y
 ### Assumptions 
 
 * Balance model are used as accounts 
-* Same transaction reference for p2p transfers used differentiating values are (transaction_type(debit, credit), user)
+* Debit and credit transactions in a p2p transfer have a common transaction reference number. Differentiating values are (transaction_type(debit, credit), user)
