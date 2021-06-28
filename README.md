@@ -8,7 +8,7 @@ This assumes you have docker installed. <br>Run these commands below in your ter
 ```bash
 cd flite
 # rename .env.example to .env
-mv .env.example .env
+mv env.example .env
 source .env
 docker-compose up
 ````
